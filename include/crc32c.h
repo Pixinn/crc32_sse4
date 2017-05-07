@@ -5,7 +5,8 @@
  * @author Anand Suresh <anandsuresh@gmail.com>
  */
 
-#include <stdint.h>
+#include <cstdint>
+#include <cstdlib>
 
 
 uint32_t hwCrc32c(uint32_t initialCrc, const char *buf, size_t len);

@@ -24,7 +24,7 @@
 #define CALC_CRC(op, crc, type, buf, len)                                                                    \
     do {                                                                                                     \
         for (; (len) >= sizeof(type); (len) -= sizeof(type), buf += sizeof(type)) {                          \
-            (crc) = op((crc), *(type *) (buf));                                                              \
+            (crc) = static_cast<uint32_t>(op((crc), *(type *) (buf)));                                       \
         }                                                                                                    \
     } while(0)
 
