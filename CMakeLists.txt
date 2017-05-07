@@ -20,7 +20,7 @@ endif()
 
 set(FOLDER_LIB_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(FOLDER_LIB_SRC "src")
-set(FOLDER_TESTS_SRC "tests")
+set(FOLDER_TESTS_SRC "test")
 
 #set( HEADERS 
 #     " ")
@@ -37,4 +37,4 @@ add_library(${PROJECT_NAME} ${HEADERS} ${SOURCES})
 source_group("Public" FILES ${PUBLIC})
 source_group("Private" FILES ${PRIVATE})
 
-#add_subdirectory(${FOLDER_TESTS_SRC})
+add_subdirectory(${FOLDER_TESTS_SRC})
