@@ -1,3 +1,13 @@
+/*
+
+MIT LICENCE: https://opensource.org/licenses/MIT
+Copyright 2015
+Anand Suresh <anandsuresh@gmail.com>
+Christophe Meneboeuf <christophe@xtof.info>
+
+*/
+
+
 #ifndef SRC_CRC_HPP_
 #define SRC_CRC_HPP_
 
