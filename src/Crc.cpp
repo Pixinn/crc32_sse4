@@ -13,11 +13,17 @@ Christophe Meneboeuf <christophe@xtof.info>
 
 namespace Crc32c
 {
-    Crc* Crc::_Instance = nullptr;
 
-    Crc::Crc()
+    bool IsHardwareAccelerationAvailable()
     {
-        if (isSSE42Available()) {
+        return isSSE42Available();
+    }
+
+
+    Crc::Crc(const uint32_t init) :
+        _crc{init}
+    {
+        if (IsHardwareAccelerationAvailable()) {
             _compute = hwCrc32c;
             _isHardAccelAvail = true;
         }
@@ -27,14 +33,5 @@ namespace Crc32c
         }
     }
 
-
-    const Crc& Crc::GetInstance()
-    {
-        // TODO Add a mutex
-        if (_Instance == nullptr) {
-            _Instance = new Crc();
-        }
-        return *_Instance;
-    }
 
 }

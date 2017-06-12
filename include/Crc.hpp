@@ -12,9 +12,13 @@ Christophe Meneboeuf <christophe@xtof.info>
 #define SRC_CRC_HPP_
 
 #include <functional>
+#include <vector>
 
 namespace Crc32c
 {
+
+    bool IsHardwareAccelerationAvailable();
+
     /// \brief Singleton class computing a CRC32.
     ///
     ///        The compute operation use hardware SSE4.2 acceleration when available,
@@ -22,21 +26,32 @@ namespace Crc32c
     class Crc
     {
     public:
+        /// \brief Constructor
+        Crc(const uint32_t init = 0u);
         /// \brief Default destructor
         ~Crc() = default;
-        /// \Returns the single instance of the class
-        static const Crc& GetInstance();
-        /// \brief Returns the CRC32 of the provided buf.
-        inline uint32_t compute(const char *buf, const size_t len) const {
-            return _compute(0, buf, len);
+        /// \brief Sets the CRC value
+        inline void operator=(const uint32_t rhs) {
+            _crc = rhs;
         }
-        /// \brief Returns true if hardware acceleration is supported
-        inline bool isHardAccelAvail() const {
-            return _isHardAccelAvail;
+        /// \brief Updates CRC computation
+        inline Crc operator+(std::vector<char>& data) {
+            _crc = _compute(_crc, data.data(), data.size());
+            return *this;
+        }
+        /// \brief Updates CRC computation
+        inline Crc operator+=(std::vector<char>& data) {
+            *this = *this + data;
+            return *this;
+        }
+        /// \brief Returns the CRC32 value
+        inline uint32_t getValue() const {
+            return _crc;
         }
         
     private:
-        Crc();
+
+        uint32_t _crc; ///< Current CRC. USed as an input value if the CRC is called many times
 
         bool _isHardAccelAvail = false; ///< True if SSE4.2 harware acceleration is available
         std::function<uint32_t(uint32_t, const char*, size_t)> _compute; ///< Hardware based or pure software function computing the CRC
