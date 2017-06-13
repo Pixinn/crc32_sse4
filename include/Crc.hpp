@@ -17,6 +17,7 @@ Christophe Meneboeuf <christophe@xtof.info>
 namespace Crc32c
 {
 
+    /// \brif Returns true if hardware acceleration is available
     bool IsHardwareAccelerationAvailable();
 
     /// \brief Singleton class computing a CRC32.
@@ -35,20 +36,15 @@ namespace Crc32c
             _crc = rhs;
         }
         /// \brief Updates CRC computation
-        inline Crc operator+(std::vector<char>& data) {
+        inline Crc operator<<(std::vector<char>& data) {
             _crc = _compute(_crc, data.data(), data.size());
-            return *this;
-        }
-        /// \brief Updates CRC computation
-        inline Crc operator+=(std::vector<char>& data) {
-            *this = *this + data;
             return *this;
         }
         /// \brief Returns the CRC32 value
         inline uint32_t getValue() const {
             return _crc;
         }
-        
+
     private:
 
         uint32_t _crc; ///< Current CRC. USed as an input value if the CRC is called many times
