@@ -17,29 +17,41 @@ Christophe Meneboeuf <christophe@xtof.info>
 namespace Crc32c
 {
 
-    /// \brif Returns true if hardware acceleration is available
+    /// \brief Returns true if hardware acceleration is available
     bool IsHardwareAccelerationAvailable();
 
-    /// \brief Singleton class computing a CRC32.
+    /// \brief Computes a CRC32.
     ///
     ///        The compute operation use hardware SSE4.2 acceleration when available,
     ///        or a software fallback otherwise.
+    ///        Operates on class hosting **char data**.
     class Crc
     {
     public:
+
         /// \brief Constructor
         Crc(const uint32_t init = 0u);
         /// \brief Default destructor
         ~Crc() = default;
+
+
         /// \brief Sets the CRC value
         inline void operator=(const uint32_t rhs) {
             _crc = rhs;
         }
-        /// \brief Updates CRC computation
-        inline Crc operator<<(std::vector<char>& data) {
+
+
+        /// \brief Updates CRC computation.
+        ///
+        ///         CRC can be computed iteratively by calling this operation on adjacent ordered block of data.
+        ///         The template parameter has to provide **char* data()** and **int size()** operations
+        template<typename T>
+        inline Crc operator<<(const T& data) {
             _crc = _compute(_crc, data.data(), data.size());
             return *this;
         }
+
+
         /// \brief Returns the CRC32 value
         inline uint32_t getValue() const {
             return _crc;
