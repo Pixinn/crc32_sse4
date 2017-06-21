@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <array>
 
 #include "Crc.hpp"
 
@@ -48,7 +50,26 @@ int main(int, char**)
         result_3 &= (crc3.getValue() == crc_str1);
     }
 
-    if(result_1 && result_2 && result_3) {
+    // TEST 4 - Another kind of container
+    std::array<char, 9> arr4;
+    std::copy(std::begin(str2), std::end(str2), std::begin(arr4));
+    Crc32c::Crc crc4;
+    crc4 << arr4;
+    const auto result_4 = (crc4.getValue() == crc_str2);
+
+
+    // TEST 5 - Testing process() operation on non begin and end iterators
+    const string str3{"X123456789X"};
+    const auto crc_str3 = crc_str2;
+    std::array<char, 11> arr5;
+    std::copy(std::begin(str3), std::end(str3), std::begin(arr5));
+    Crc32c::Crc crc5;
+    crc5.process<decltype(arr5)>(std::begin(arr5)+1, std::end(arr5)-1);
+    const auto result_5 = (crc5.getValue() == crc_str3);
+
+
+    // FINAL RESULT
+    if(result_1 && result_2 && result_3 && result_4 && result_5) {
         cout << "SUCCESS!\n";
         return 0;
     }

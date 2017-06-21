@@ -120,7 +120,9 @@ uint32_t swCrc32c(uint32_t initialCrc, const char *buf, size_t len) {
 
 
     // If the string is empty, return 0
-    if (len == 0) return (uint32_t)crc;
+    if (len == 0) {
+        return (uint32_t)crc;
+    }
 
     // XOR the initial CRC with INT_MAX
     crc ^= 0xFFFFFFFF;
@@ -151,4 +153,3 @@ uint32_t swCrc32c(uint32_t initialCrc, const char *buf, size_t len) {
     // XOR again with INT_MAX
     return (uint32_t)(crc ^= 0xFFFFFFFF);
 }
-

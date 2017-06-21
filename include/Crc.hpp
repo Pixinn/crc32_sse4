@@ -1,18 +1,20 @@
 /*
 
 MIT LICENCE: https://opensource.org/licenses/MIT
-Copyright 2015
-Anand Suresh <anandsuresh@gmail.com>
-Christophe Meneboeuf <christophe@xtof.info>
+Copyright 2015-2017
+@author Anand Suresh <anandsuresh@gmail.com>
+@author Christophe Meneboeuf <christophe@xtof.info> for the C++ wrapper
 
 */
 
 
-#ifndef SRC_CRC_HPP_
-#define SRC_CRC_HPP_
+#ifndef INCLUDE_CRC_HPP_
+#define INCLUDE_CRC_HPP_
 
 #include <functional>
-#include <vector>
+#include <iterator>
+
+#include "Traits.hpp"
 
 namespace Crc32c
 {
@@ -20,11 +22,18 @@ namespace Crc32c
     /// \brief Returns true if hardware acceleration is available
     bool IsHardwareAccelerationAvailable();
 
-    /// \brief Computes a CRC32.
+    //////////////////////////
+    /// \brief Computes a CRC32 (*Castagnoli* variant)
     ///
-    ///        The compute operation use hardware SSE4.2 acceleration when available,
+    ///        The *process* operation relies on hardware SSE4.2 acceleration when available,
     ///        or a software fallback otherwise.
-    ///        Operates on class hosting **char data**.
+    ///
+    ///        Operates on **containers** providing **const_iterator**.<br/>
+    ///        The computation can be called iteratively on "adjacent and ordered data".<br/>
+    ///        **Note**: If the data carried by the collection is not 8bit wide, the CRC computed will depend
+    ///        on the endianness of the computer.
+    ///
+    //////////////////////////
     class Crc
     {
     public:
@@ -36,19 +45,39 @@ namespace Crc32c
 
 
         /// \brief Sets the CRC value
+        ///
+        ///        Can be used to reset the CRC computation by setting with 0.
         inline void operator=(const uint32_t rhs) {
             _crc = rhs;
         }
 
 
-        /// \brief Updates CRC computation.
+        ///////////////////////////////////////
+        /// \brief Updates CRC computation with data between two iterators
         ///
-        ///         CRC can be computed iteratively by calling this operation on adjacent ordered block of data.
-        ///         The template parameter has to provide **char* data()** and **int size()** operations
-        template<typename T>
-        inline Crc operator<<(const T& data) {
-            _crc = _compute(_crc, data.data(), data.size());
+        ///        *NOTE:* Data carried by the container **must be layed out contiguouly in memory**!
+        /// \tparam CONTAINER_T A containder that provide const_iterator
+        ///////////////////////////////////////
+        template<typename CONTAINER_T>
+        inline Crc& process(typename CONTAINER_T::const_iterator it_beg, typename CONTAINER_T::const_iterator it_end)
+        {
+            static_assert(Traits::has_contiguous_memory<CONTAINER_T>::value,
+                "Data carried by the container must be layed out contiguouly in memory!");
+            const auto begin = reinterpret_cast<const char*>(&(*it_beg));
+            const auto end = reinterpret_cast<const char*>(&(*it_end));
+            const auto size = end - begin;
+            _crc = _compute(_crc, begin, size);
             return *this;
+        }
+
+        ///////////////////////////////////////
+        /// \brief  Updates CRC computation with data from a container.
+        /// \tparam CONTAINER_T A containder that can be argument to std::begin and std::end
+        ///////////////////////////////////////
+        template<typename CONTAINER_T>
+        inline Crc& operator<<(const CONTAINER_T& data)
+        {
+            return process<CONTAINER_T>(std::begin(data), std::end(data));
         }
 
 
@@ -63,7 +92,6 @@ namespace Crc32c
 
         bool _isHardAccelAvail = false; ///< True if SSE4.2 harware acceleration is available
         std::function<uint32_t(uint32_t, const char*, size_t)> _compute; ///< Hardware based or pure software function computing the CRC
-        static Crc* _Instance;  ///< Single static instance
     };
 }
 
