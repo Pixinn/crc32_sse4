@@ -64,8 +64,8 @@ namespace Crc32c
             static_assert(Traits::has_contiguous_memory<CONTAINER_T>::value,
                 "Data carried by the container must be layed out contiguouly in memory!");
             const auto begin = reinterpret_cast<const char*>(&(*it_beg));
-            const auto end = reinterpret_cast<const char*>(&(*it_end));
-            const auto size = end - begin;
+            const auto end = reinterpret_cast<const char*>(&(*(it_end-1)));
+            const auto size = end - begin + sizeof(typename CONTAINER_T::value_type);
             _crc = _compute(_crc, begin, size);
             return *this;
         }
