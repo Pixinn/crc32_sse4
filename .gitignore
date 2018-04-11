@@ -1,5 +1,6 @@
 build_*/
 build_*/
+build/
 x64/
 .DS_Store
 *.dir

@@ -38,6 +38,7 @@ static uint32_t crc32cTable[8][256];
  * Cross-platform CPU feature set detection to check for availability of hardware-based CRC-32C
  */
 void cpuid(uint32_t op, uint32_t reg[4]) {
+    (void)(op);
 #if defined(_WIN64) || defined(_WIN32)
     __cpuid((int *)reg, 1);
 #elif defined(__x86_64__)
